@@ -26,25 +26,26 @@ function App() {
     setEditingTask(null);
   };
 
-  const toggleStatus = (taskId) => {
-    setTasks(tasks.map(task => {
-      if (task.id === taskId) {
-        let newStatus;
-        switch (task.status) {
-          case STATUS.PENDING:
-            newStatus = STATUS.IN_PROGRESS;
-            break;
-          case STATUS.IN_PROGRESS:
-            newStatus = STATUS.COMPLETED;
-            break;
-          default:
-            newStatus = STATUS.PENDING;
-        }
-        return { ...task, status: newStatus };
+  // No toggleStatus, adicione verificação para não alterar tarefas expiradas
+const toggleStatus = (taskId) => {
+  setTasks(tasks.map(task => {
+    if (task.id === taskId && task.status !== STATUS.EXPIRED) {
+      let newStatus;
+      switch (task.status) {
+        case STATUS.PENDING:
+          newStatus = STATUS.IN_PROGRESS;
+          break;
+        case STATUS.IN_PROGRESS:
+          newStatus = STATUS.COMPLETED;
+          break;
+        default:
+          newStatus = STATUS.PENDING;
       }
-      return task;
-    }));
-  };
+      return { ...task, status: newStatus };
+    }
+    return task;
+  }));
+};
 
   const deleteTask = (taskId) => {
     setTasks(tasks.filter(task => task.id !== taskId));

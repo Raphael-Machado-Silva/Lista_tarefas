@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { CATEGORIES, STATUS } from '../utils/constants';
+import { CATEGORIES, STATUS, CATEGORY_TIMERS } from '../utils/constants';
 
 const TaskForm = ({ onAddTask }) => {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState(CATEGORIES.DAILY);
-  const [status, setStatus] = useState(STATUS.PENDING);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,13 +13,21 @@ const TaskForm = ({ onAddTask }) => {
         id: Date.now(),
         title: title.trim(),
         category,
-        status,
-        createdAt: new Date().toISOString()
+        status: STATUS.PENDING,
+        createdAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + CATEGORY_TIMERS[category]).toISOString()
       });
       setTitle('');
       setCategory(CATEGORIES.DAILY);
-      setStatus(STATUS.PENDING);
     }
+  };
+
+  const getTimerText = () => {
+    const timer = CATEGORY_TIMERS[category];
+    if (timer === CATEGORY_TIMERS[CATEGORIES.DAILY]) return '⏰ Expira em 24h';
+    if (timer === CATEGORY_TIMERS[CATEGORIES.WEEKLY]) return '⏰ Expira em 7 dias';
+    if (timer === CATEGORY_TIMERS[CATEGORIES.MONTHLY]) return '⏰ Expira em 30 dias';
+    return '⏰ Expira em 1 ano';
   };
 
   return (
@@ -44,21 +51,15 @@ const TaskForm = ({ onAddTask }) => {
           onChange={(e) => setCategory(e.target.value)}
           className="category-select"
         >
-          <option value={CATEGORIES.DAILY}>Diária</option>
-          <option value={CATEGORIES.WEEKLY}>Semanal</option>
-          <option value={CATEGORIES.MONTHLY}>Mensal</option>
-          <option value={CATEGORIES.YEARLY}>Anual</option>
+          <option value={CATEGORIES.DAILY}>Diária (24h)</option>
+          <option value={CATEGORIES.WEEKLY}>Semanal (7 dias)</option>
+          <option value={CATEGORIES.MONTHLY}>Mensal (30 dias)</option>
+          <option value={CATEGORIES.YEARLY}>Anual (365 dias)</option>
         </select>
 
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="status-select"
-        >
-          <option value={STATUS.PENDING}>Pendente</option>
-          <option value={STATUS.IN_PROGRESS}>Em Andamento</option>
-          <option value={STATUS.COMPLETED}>Concluída</option>
-        </select>
+        <span className="timer-info">
+          {getTimerText()}
+        </span>
       </div>
     </form>
   );
